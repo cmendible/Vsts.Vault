@@ -1,0 +1,9 @@
+/src/packages
+/src/EasyAzureServiceBus/bin
+/src/EasyAzureServiceBus/obj
+/src/*.suo
+/src/EasyAzureServiceBus.Sample/*
+obj
+bin
+/src/.nuget/package
+*.user
