@@ -3,6 +3,7 @@
     using System;
     using System.ComponentModel.Composition;
     using System.IO;
+    using System.Linq;
     using System.Web;
     using LibGit2Sharp;
     using Vsts.Vault.Logging;
@@ -21,15 +22,6 @@
             this.logger = logger;
         }
 
-        public void Clone(string sourceUrl, string path)
-        {
-            this.logger.InfoFormat("Cloning {0}", sourceUrl);
-            Repository.Clone(HttpUtility.UrlPathEncode(sourceUrl), path, new CloneOptions
-            {
-                CredentialsProvider = this.CredentialsProvider
-            });
-        }
-
         public void CloneOrPull(string sourceUrl, string path)
         {
             if (Directory.Exists(path))
@@ -40,17 +32,40 @@
             {
                 this.Clone(sourceUrl, path);
             }
+
+            this.CreateTrackingBranches(path);
         }
 
-        public void Pull(string sourceUrl, string path)
+        private void Clone(string sourceUrl, string path)
         {
-            this.logger.InfoFormat("Pulling {0}", sourceUrl);
+            this.logger.InfoFormat("Cloning {0}", sourceUrl);
+            Repository.Clone(HttpUtility.UrlPathEncode(sourceUrl), path, new CloneOptions
+            {
+                CredentialsProvider = this.CredentialsProvider
+            });         
+        }
+
+        private void CreatTrackingBranch(Repository repo, string branchName, string trackedBranchName)
+        {
+            // Retrieve remote tracking branch
+            Branch trackedBranch = repo.Branches[trackedBranchName];
+
+            // Create local branch pointing at the same Commit
+            Branch branch = repo.CreateBranch(branchName, trackedBranch.Tip);
+
+            repo.Branches.Update(branch,
+                b => b.TrackedBranch = trackedBranch.CanonicalName);
+        }
+
+        private void CreateTrackingBranches(string path)
+        {
             using (var repo = new Repository(path))
             {
-                PullOptions options = new PullOptions();
-                options.FetchOptions = new FetchOptions();
-                options.FetchOptions.CredentialsProvider = this.CredentialsProvider;
-                repo.Network.Pull(new LibGit2Sharp.Signature(this.configuration.VaultConfiguration.Username, this.configuration.VaultConfiguration.UserEmail, new DateTimeOffset(DateTime.Now)), options);
+                var localBranches = repo.Branches.Where(b => !b.IsRemote).Select(b => b.FriendlyName).ToList();
+                foreach (Branch b in repo.Branches.Where(b => b.IsRemote && !localBranches.Contains(this.ExtractBranchName(b.FriendlyName))))
+                {
+                    this.CreatTrackingBranch(repo, this.ExtractBranchName(b.FriendlyName), b.FriendlyName);
+                }
             }
         }
 
@@ -62,6 +77,23 @@
                 Password = this.configuration.VaultConfiguration.Password
             };
             return this.credentials;
+        }
+
+        private string ExtractBranchName(string remoteBranchName)
+        {
+            return remoteBranchName.Split('/').Last();
+        }
+
+        private void Pull(string sourceUrl, string path)
+        {
+            this.logger.InfoFormat("Pulling {0}", sourceUrl);
+            using (var repo = new Repository(path))
+            {
+                PullOptions options = new PullOptions();
+                options.FetchOptions = new FetchOptions();
+                options.FetchOptions.CredentialsProvider = this.CredentialsProvider;
+                repo.Network.Pull(new LibGit2Sharp.Signature(this.configuration.VaultConfiguration.Username, this.configuration.VaultConfiguration.UserEmail, new DateTimeOffset(DateTime.Now)), options);
+            }
         }
     }
 }
