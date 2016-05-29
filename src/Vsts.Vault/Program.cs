@@ -1,7 +1,7 @@
 ﻿namespace Vsts.Vault.WindowsService
 {
     using System.ServiceProcess;
-
+    using System.Threading;
     static class Program
     {
         /// <summary>
