@@ -5,6 +5,10 @@
     using System.ServiceProcess;
     using Vsts.Vault.WindowsService.Properties;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="System.Configuration.Install.Installer" />
     [RunInstaller(true)]
     public partial class Installer : System.Configuration.Install.Installer
     {

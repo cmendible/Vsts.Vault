@@ -8,14 +8,37 @@
     using Vsts.Vault.Logging;
     using Vsts.Vault.TeamServices;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="Vsts.Vault.IVaultService" />
     [Export(typeof(IVaultService))]
     public class VaultService : IVaultService
     {
+        /// <summary>
+        /// The configuration
+        /// </summary>
         private readonly IConfiguration configuration;
+        /// <summary>
+        /// The team services consumer
+        /// </summary>
         private readonly ITeamServicesConsumer teamServicesConsumer;
+        /// <summary>
+        /// The git service
+        /// </summary>
         private readonly IGitService gitService;
+        /// <summary>
+        /// The logger
+        /// </summary>
         private readonly ILogger logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="VaultService"/> class.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <param name="teamServicesConsumer">The team services consumer.</param>
+        /// <param name="gitService">The git service.</param>
+        /// <param name="logger">The logger.</param>
         [ImportingConstructor]  
         public VaultService(IConfiguration configuration, ITeamServicesConsumer teamServicesConsumer, IGitService gitService, ILogger logger)
         {
@@ -25,6 +48,9 @@
             this.logger = logger;
         }
 
+        /// <summary>
+        /// Safes the deposit.
+        /// </summary>
         public void SafeDeposit()
         {
             var startTime = DateTime.UtcNow;
@@ -66,6 +92,10 @@
             this.logger.InfoFormat("Vsts.Vault backup ended at {0}. Time elapsed {1}", DateTime.UtcNow.ToString(), timer.Elapsed);
         }
 
+        /// <summary>
+        /// Creates the directory.
+        /// </summary>
+        /// <param name="path">The path.</param>
         public void CreateDirectory(string path)
         {
             var fullPath = Path.Combine(this.configuration.VaultConfiguration.TargetFolder, path);

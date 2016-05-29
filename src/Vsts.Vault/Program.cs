@@ -2,6 +2,10 @@
 {
     using System.ServiceProcess;
     using System.Threading;
+
+    /// <summary>
+    /// Vsts.Vault Windows Service entry point 
+    /// </summary>
     static class Program
     {
         /// <summary>

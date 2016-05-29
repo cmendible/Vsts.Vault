@@ -3,9 +3,20 @@
     using System.ComponentModel.Composition;
     using System.Configuration;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="System.Configuration.ConfigurationSection" />
+    /// <seealso cref="Vsts.Vault.IVaultConfiguration" />
     [Export(typeof(IVaultConfiguration))]
     public class VaultConfiguration : ConfigurationSection, IVaultConfiguration
     {
+        /// <summary>
+        /// Gets the username.
+        /// </summary>
+        /// <value>
+        /// The username.
+        /// </value>
         [ConfigurationProperty("Username", IsRequired = true)]
         public string Username
         {
@@ -15,6 +26,12 @@
             }
         }
 
+        /// <summary>
+        /// Gets the user email.
+        /// </summary>
+        /// <value>
+        /// The user email.
+        /// </value>
         [ConfigurationProperty("UserEmail", IsRequired = true)]
         public string UserEmail
         {
@@ -24,6 +41,12 @@
             }
         }
 
+        /// <summary>
+        /// Gets the password.
+        /// </summary>
+        /// <value>
+        /// The password.
+        /// </value>
         [ConfigurationProperty("Password", IsRequired = true)]
         public string Password
         {
@@ -33,6 +56,12 @@
             }
         }
 
+        /// <summary>
+        /// Gets the account.
+        /// </summary>
+        /// <value>
+        /// The account.
+        /// </value>
         [ConfigurationProperty("Account", IsRequired = true)]
         public string Account
         {
@@ -42,6 +71,12 @@
             }
         }
 
+        /// <summary>
+        /// Gets the target folder.
+        /// </summary>
+        /// <value>
+        /// The target folder.
+        /// </value>
         [ConfigurationProperty("TargetFolder", IsRequired = true)]
         public string TargetFolder
         {
@@ -51,6 +86,10 @@
             }
         }
 
+        /// <summary>
+        /// Loads this instance.
+        /// </summary>
+        /// <returns></returns>
         public static VaultConfiguration Load()
         {
             return (VaultConfiguration)ConfigurationManager.GetSection("VaultConfiguration");

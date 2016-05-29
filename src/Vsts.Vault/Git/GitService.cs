@@ -8,6 +8,10 @@
     using LibGit2Sharp;
     using Vsts.Vault.Logging;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="Vsts.Vault.Git.IGitService" />
     [Export(typeof(IGitService))]
     public class GitService : IGitService
     {
@@ -15,6 +19,11 @@
         private Credentials credentials;
         private readonly ILogger logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GitService"/> class.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
+        /// <param name="logger">The logger.</param>
         [ImportingConstructor]  
         public GitService(IConfiguration configuration, ILogger logger)
         {
@@ -22,6 +31,11 @@
             this.logger = logger;
         }
 
+        /// <summary>
+        /// Clones the or pull.
+        /// </summary>
+        /// <param name="sourceUrl">The source URL.</param>
+        /// <param name="path">The path.</param>
         public void CloneOrPull(string sourceUrl, string path)
         {
             if (Directory.Exists(path))
@@ -36,6 +50,11 @@
             this.CreateTrackingBranches(path);
         }
 
+        /// <summary>
+        /// Clones the specified source URL.
+        /// </summary>
+        /// <param name="sourceUrl">The source URL.</param>
+        /// <param name="path">The path.</param>
         private void Clone(string sourceUrl, string path)
         {
             this.logger.InfoFormat("Cloning {0}", sourceUrl);
@@ -45,6 +64,12 @@
             });         
         }
 
+        /// <summary>
+        /// Creats the tracking branch.
+        /// </summary>
+        /// <param name="repo">The repo.</param>
+        /// <param name="branchName">Name of the branch.</param>
+        /// <param name="trackedBranchName">Name of the tracked branch.</param>
         private void CreatTrackingBranch(Repository repo, string branchName, string trackedBranchName)
         {
             // Retrieve remote tracking branch
@@ -57,6 +82,10 @@
                 b => b.TrackedBranch = trackedBranch.CanonicalName);
         }
 
+        /// <summary>
+        /// Creates the tracking branches.
+        /// </summary>
+        /// <param name="path">The path.</param>
         private void CreateTrackingBranches(string path)
         {
             using (var repo = new Repository(path))
@@ -69,6 +98,13 @@
             }
         }
 
+        /// <summary>
+        /// Credentialses the provider.
+        /// </summary>
+        /// <param name="url">The URL.</param>
+        /// <param name="usernameFromUrl">The username from URL.</param>
+        /// <param name="types">The types.</param>
+        /// <returns></returns>
         private Credentials CredentialsProvider(string url, string usernameFromUrl, SupportedCredentialTypes types)
         {
             this.credentials = new UsernamePasswordCredentials
@@ -79,11 +115,21 @@
             return this.credentials;
         }
 
+        /// <summary>
+        /// Extracts the name of the branch.
+        /// </summary>
+        /// <param name="remoteBranchName">Name of the remote branch.</param>
+        /// <returns></returns>
         private string ExtractBranchName(string remoteBranchName)
         {
             return remoteBranchName.Split('/').Last();
         }
 
+        /// <summary>
+        /// Pulls the specified source URL.
+        /// </summary>
+        /// <param name="sourceUrl">The source URL.</param>
+        /// <param name="path">The path.</param>
         private void Pull(string sourceUrl, string path)
         {
             this.logger.InfoFormat("Pulling {0}", sourceUrl);

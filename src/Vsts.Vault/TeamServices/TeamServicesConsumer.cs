@@ -8,17 +8,34 @@
     using System.Threading.Tasks;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <seealso cref="Vsts.Vault.TeamServices.ITeamServicesConsumer" />
     [Export(typeof(ITeamServicesConsumer))]
     public class TeamServicesConsumer : ITeamServicesConsumer
     {
+        /// <summary>
+        /// The configuration
+        /// </summary>
         private readonly IConfiguration configuration;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TeamServicesConsumer"/> class.
+        /// </summary>
+        /// <param name="configuration">The configuration.</param>
         [ImportingConstructor]
         public TeamServicesConsumer(IConfiguration configuration)
         {
             this.configuration = configuration;
         }
 
+        /// <summary>
+        /// Gets the asynchronous.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="url">The URL.</param>
+        /// <returns></returns>
         public async Task<T> GetAsync<T>(string url)
         {
             using (var client = new HttpClient())
