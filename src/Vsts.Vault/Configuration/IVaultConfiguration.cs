@@ -44,5 +44,13 @@
         /// The target folder.
         /// </value>
         string TargetFolder { get; }
+
+        /// <summary>
+        /// Gets if Prune will be enabled for Git fetch operations.
+        /// </summary>
+        /// <value>
+        /// The Prune value.
+        /// </value>
+        bool Prune { get; }
     }
 }

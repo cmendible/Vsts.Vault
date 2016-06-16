@@ -24,7 +24,7 @@
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="logger">The logger.</param>
-        [ImportingConstructor]  
+        [ImportingConstructor]
         public GitService(IConfiguration configuration, ILogger logger)
         {
             this.configuration = configuration;
@@ -61,7 +61,7 @@
             Repository.Clone(HttpUtility.UrlPathEncode(sourceUrl), path, new CloneOptions
             {
                 CredentialsProvider = this.CredentialsProvider
-            });         
+            });
         }
 
         /// <summary>
@@ -136,8 +136,11 @@
             using (var repo = new Repository(path))
             {
                 PullOptions options = new PullOptions();
-                options.FetchOptions = new FetchOptions();
-                options.FetchOptions.CredentialsProvider = this.CredentialsProvider;
+                options.FetchOptions = new FetchOptions()
+                {
+                    Prune = this.configuration.VaultConfiguration.Prune,
+                    CredentialsProvider = this.CredentialsProvider
+                };
                 repo.Network.Pull(new LibGit2Sharp.Signature(this.configuration.VaultConfiguration.Username, this.configuration.VaultConfiguration.UserEmail, new DateTimeOffset(DateTime.Now)), options);
             }
         }

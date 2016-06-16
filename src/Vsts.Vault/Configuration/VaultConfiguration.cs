@@ -87,12 +87,27 @@
         }
 
         /// <summary>
+        /// Gets the target folder.
+        /// </summary>
+        /// <value>
+        /// The target folder.
+        /// </value>
+        [ConfigurationProperty("Prune", DefaultValue = true)]
+        public bool Prune
+        {
+            get
+            {
+                return (bool)this["Prune"];
+            }
+        }
+
+        /// <summary>
         /// Loads this instance.
         /// </summary>
         /// <returns></returns>
         public static VaultConfiguration Load()
         {
             return (VaultConfiguration)ConfigurationManager.GetSection("VaultConfiguration");
-        }        
+        }
     }
 }
