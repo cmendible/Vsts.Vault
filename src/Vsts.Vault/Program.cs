@@ -29,8 +29,8 @@
 
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[] 
-            { 
-                new Service() 
+            {
+                service
             };
             ServiceBase.Run(ServicesToRun);
 #else
