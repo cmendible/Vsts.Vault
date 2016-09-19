@@ -55,38 +55,46 @@
         /// </summary>
         public void SafeDeposit()
         {
-            var startTime = DateTime.UtcNow;
-            var timer = System.Diagnostics.Stopwatch.StartNew();
-
-            var repositories = this.GetRepositories();
-
-            if (repositories == null)
+            try
             {
-                return;
-            }
 
-            var repositoriesGroupedByTeamProject = repositories.GroupBy(m => m.project.name).ToList();
+                var startTime = DateTime.UtcNow;
+                var timer = System.Diagnostics.Stopwatch.StartNew();
 
-            this.logger.InfoFormat("Vsts.Vault backup started at {0}", startTime.ToString());
-            foreach (var teamProject in repositoriesGroupedByTeamProject)
-            {
-                this.CreateDirectory(teamProject.Key);
-                foreach (var repo in teamProject)
+                var repositories = this.GetRepositories();
+
+                if (repositories == null)
                 {
-                    var path = Path.Combine(teamProject.Key, repo.name);
-
-                    VaultService.InvokeOrRetry(
-                        () => this.gitService.CloneOrPull(repo.remoteUrl, this.configuration.VaultConfiguration.TargetFolder + path),
-                        (ex) =>this.logger.ErrorFormat("Error on {0} with message {1}... Retrying...", repo.remoteUrl, ex.Message),
-                        () => this.logger.FatalFormat("Error on {0} ... Abort...\n", repo.remoteUrl));
+                    return;
                 }
+
+                var repositoriesGroupedByTeamProject = repositories.GroupBy(m => m.project.name).ToList();
+
+                this.logger.InfoFormat("Vsts.Vault backup started at {0}", startTime.ToString());
+                foreach (var teamProject in repositoriesGroupedByTeamProject)
+                {
+                    this.CreateDirectory(teamProject.Key);
+                    foreach (var repo in teamProject)
+                    {
+                        var path = Path.Combine(teamProject.Key, repo.name);
+
+                        VaultService.InvokeOrRetry(
+                            () => this.gitService.CloneOrPull(repo.remoteUrl, this.configuration.VaultConfiguration.TargetFolder + path),
+                            (ex) => this.logger.ErrorFormat("Error on {0} with message {1}... Retrying...", repo.remoteUrl, ex.Message),
+                            () => this.logger.FatalFormat("Error on {0} ... Abort...\n", repo.remoteUrl));
+                    }
+                }
+
+                timer.Stop();
+
+                this.logger.InfoFormat("Readed {0} team projects from Visual Studio Team Services", repositoriesGroupedByTeamProject.Count);
+                this.logger.InfoFormat("Readed {0} repositories from Visual Studio Team Services", repositories.Count);
+                this.logger.InfoFormat("Vsts.Vault backup ended at {0}. Time elapsed {1}", DateTime.UtcNow.ToString(), timer.Elapsed);
             }
-
-            timer.Stop();
-
-            this.logger.InfoFormat("Readed {0} team projects from Visual Studio Team Services", repositoriesGroupedByTeamProject.Count);
-            this.logger.InfoFormat("Readed {0} repositories from Visual Studio Team Services", repositories.Count);
-            this.logger.InfoFormat("Vsts.Vault backup ended at {0}. Time elapsed {1}", DateTime.UtcNow.ToString(), timer.Elapsed);
+            catch (Exception ex)
+            {
+                this.logger.Fatal(ex);
+            }
         }
 
         /// <summary>
