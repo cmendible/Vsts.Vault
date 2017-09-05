@@ -1,15 +1,11 @@
-﻿namespace Vsts.Vault
-{
-    using System.ComponentModel.Composition;
-    using System.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 
+namespace Vsts.Vault
+{
     /// <summary>
     /// 
     /// </summary>
-    /// <seealso cref="System.Configuration.ConfigurationSection" />
-    /// <seealso cref="Vsts.Vault.IVaultConfiguration" />
-    [Export(typeof(IVaultConfiguration))]
-    public class VaultConfiguration : ConfigurationSection, IVaultConfiguration
+    public class VaultConfiguration
     {
         /// <summary>
         /// Gets the username.
@@ -17,13 +13,10 @@
         /// <value>
         /// The username.
         /// </value>
-        [ConfigurationProperty("Username", IsRequired = true)]
         public string Username
         {
-            get
-            {
-                return this["Username"].ToString();
-            }
+            get;
+            set;
         }
 
         /// <summary>
@@ -32,13 +25,10 @@
         /// <value>
         /// The user email.
         /// </value>
-        [ConfigurationProperty("UserEmail", IsRequired = true)]
         public string UserEmail
         {
-            get
-            {
-                return this["UserEmail"].ToString();
-            }
+            get;
+            set;
         }
 
         /// <summary>
@@ -47,13 +37,10 @@
         /// <value>
         /// The password.
         /// </value>
-        [ConfigurationProperty("Password", IsRequired = true)]
         public string Password
         {
-            get
-            {
-                return this["Password"].ToString();
-            }
+            get;
+            set;
         }
 
         /// <summary>
@@ -62,13 +49,10 @@
         /// <value>
         /// The account.
         /// </value>
-        [ConfigurationProperty("Account", IsRequired = true)]
         public string Account
         {
-            get
-            {
-                return this["Account"].ToString();
-            }
+            get;
+            set;
         }
 
         /// <summary>
@@ -77,13 +61,10 @@
         /// <value>
         /// The target folder.
         /// </value>
-        [ConfigurationProperty("TargetFolder", IsRequired = true)]
         public string TargetFolder
         {
-            get
-            {
-                return this["TargetFolder"].ToString();
-            }
+            get;
+            set;
         }
 
         /// <summary>
@@ -92,22 +73,10 @@
         /// <value>
         /// The target folder.
         /// </value>
-        [ConfigurationProperty("Prune", DefaultValue = true)]
         public bool Prune
         {
-            get
-            {
-                return (bool)this["Prune"];
-            }
-        }
-
-        /// <summary>
-        /// Loads this instance.
-        /// </summary>
-        /// <returns></returns>
-        public static VaultConfiguration Load()
-        {
-            return (VaultConfiguration)ConfigurationManager.GetSection("VaultConfiguration");
+            get;
+            set;
         }
     }
 }

@@ -1,21 +1,21 @@
 ﻿namespace Vsts.Vault.Git
 {
     using System;
-    using System.ComponentModel.Composition;
     using System.IO;
     using System.Linq;
     using System.Web;
     using LibGit2Sharp;
+    using LibGit2Sharp.Handlers;
+    using Microsoft.Extensions.Options;
     using Vsts.Vault.Logging;
 
     /// <summary>
     /// 
     /// </summary>
     /// <seealso cref="Vsts.Vault.Git.IGitService" />
-    [Export(typeof(IGitService))]
     public class GitService : IGitService
     {
-        private readonly IConfiguration configuration;
+        private readonly VaultConfiguration configuration;
         private Credentials credentials;
         private readonly ILogger logger;
 
@@ -24,10 +24,9 @@
         /// </summary>
         /// <param name="configuration">The configuration.</param>
         /// <param name="logger">The logger.</param>
-        [ImportingConstructor]
-        public GitService(IConfiguration configuration, ILogger logger)
+        public GitService(IOptions<VaultConfiguration> configuration, ILogger logger)
         {
-            this.configuration = configuration;
+            this.configuration = configuration.Value;
             this.logger = logger;
         }
 
@@ -109,8 +108,8 @@
         {
             this.credentials = new UsernamePasswordCredentials
             {
-                Username = this.configuration.VaultConfiguration.Username,
-                Password = this.configuration.VaultConfiguration.Password
+                Username = this.configuration.Username,
+                Password = this.configuration.Password
             };
             return this.credentials;
         }
@@ -138,10 +137,18 @@
                 PullOptions options = new PullOptions();
                 options.FetchOptions = new FetchOptions()
                 {
-                    Prune = this.configuration.VaultConfiguration.Prune,
+                    Prune = this.configuration.Prune,
                     CredentialsProvider = this.CredentialsProvider
                 };
-                repo.Network.Pull(new LibGit2Sharp.Signature(this.configuration.VaultConfiguration.Username, this.configuration.VaultConfiguration.UserEmail, new DateTimeOffset(DateTime.Now)), options);
+                options.MergeOptions = new MergeOptions()
+                {
+                    FileConflictStrategy = CheckoutFileConflictStrategy.Theirs
+                };
+
+                Commands.Pull(
+                    repo,
+                    new LibGit2Sharp.Signature(this.configuration.Username, this.configuration.UserEmail, new DateTimeOffset(DateTime.Now)),
+                    options);
             }
         }
     }

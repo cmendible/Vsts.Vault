@@ -2,10 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel.Composition;
     using System.IO;
     using System.Linq;
     using System.Threading;
+    using Microsoft.Extensions.Options;
     using Vsts.Vault.Git;
     using Vsts.Vault.Logging;
     using Vsts.Vault.TeamServices;
@@ -14,13 +14,12 @@
     /// 
     /// </summary>
     /// <seealso cref="Vsts.Vault.IVaultService" />
-    [Export(typeof(IVaultService))]
     public class VaultService : IVaultService
     {
         /// <summary>
         /// The configuration
         /// </summary>
-        private readonly IConfiguration configuration;
+        private readonly VaultConfiguration configuration;
         /// <summary>
         /// The team services consumer
         /// </summary>
@@ -41,10 +40,9 @@
         /// <param name="teamServicesConsumer">The team services consumer.</param>
         /// <param name="gitService">The git service.</param>
         /// <param name="logger">The logger.</param>
-        [ImportingConstructor]  
-        public VaultService(IConfiguration configuration, ITeamServicesConsumer teamServicesConsumer, IGitService gitService, ILogger logger)
+        public VaultService(IOptions<VaultConfiguration> configuration, ITeamServicesConsumer teamServicesConsumer, IGitService gitService, ILogger logger)
         {
-            this.configuration = configuration;
+            this.configuration = configuration.Value;
             this.teamServicesConsumer = teamServicesConsumer;
             this.gitService = gitService;
             this.logger = logger;
@@ -79,7 +77,7 @@
                         var path = Path.Combine(teamProject.Key, repo.name);
 
                         VaultService.InvokeOrRetry(
-                            () => this.gitService.CloneOrPull(repo.remoteUrl, this.configuration.VaultConfiguration.TargetFolder + path),
+                            () => this.gitService.CloneOrPull(repo.remoteUrl, this.configuration.TargetFolder + path),
                             (ex) => this.logger.ErrorFormat("Error on {0} with message {1}... Retrying...", repo.remoteUrl, ex.Message),
                             () => this.logger.FatalFormat("Error on {0} ... Abort...\n", repo.remoteUrl));
                     }
@@ -101,9 +99,9 @@
         /// Creates the directory.
         /// </summary>
         /// <param name="path">The path.</param>
-        private void CreateDirectory(string path)    
+        private void CreateDirectory(string path)
         {
-            var fullPath = Path.Combine(this.configuration.VaultConfiguration.TargetFolder, path);
+            var fullPath = Path.Combine(this.configuration.TargetFolder, path);
             if (!Directory.Exists(fullPath))
             {
                 this.logger.DebugFormat("Created directory '{0}'", fullPath);
@@ -120,7 +118,7 @@
                 {
                     string accountUrl = string.Format(
                         "https://{0}.visualstudio.com/DefaultCollection/_apis/git/repositories?api-version=1.0",
-                        this.configuration.VaultConfiguration.Account);
+                        this.configuration.Account);
 
                     var task = teamServicesConsumer.GetAsync<Repositories>(accountUrl);
                     task.Wait(new TimeSpan(0, 0, 30));

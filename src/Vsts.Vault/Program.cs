@@ -1,9 +1,8 @@
-﻿namespace Vsts.Vault.WindowsService
+﻿namespace Vsts.Vault
 {
+    using System;
     using System.IO;
     using System.Reflection;
-    using System.ServiceProcess;
-    using System.Threading;
     using Serilog;
 
     /// <summary>
@@ -28,30 +27,19 @@
                 .WriteTo.RollingFile(Path.Combine(fileinfo.DirectoryName, "logs", "log-{Date}.txt"))
                 .CreateLogger();
 
-            using (Service service = new Service())
+            try
             {
-                Program.Start(service);
+                IVaultService vault = Bootstrapper.GetVaultService();
+                vault.SafeDeposit();
             }
-        }
-
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        static void Start(Service service)
-        {
-#if (!DEBUG)
-
-            ServiceBase[] ServicesToRun;
-            ServicesToRun = new ServiceBase[] 
+            catch (Exception ex)
             {
-                service
-            };
-            ServiceBase.Run(ServicesToRun);
-#else
-            AutoResetEvent eventPulse = new AutoResetEvent(false);
-            service.BackUp();
-            eventPulse.WaitOne();
-#endif
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                Console.WriteLine("Done");
+            }
         }
     }
 }

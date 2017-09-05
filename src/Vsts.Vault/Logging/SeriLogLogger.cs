@@ -1,14 +1,12 @@
 ﻿namespace Vsts.Vault.Logging
 {
     using System;
-    using System.ComponentModel.Composition;
     using Serilog;
 
     /// <summary>
     /// 
     /// </summary>
     /// <seealso cref="Vsts.Vault.Logging.ILogger" />
-    [Export(typeof(ILogger))]
     public class SeriLogLogger : ILogger
     {
 
