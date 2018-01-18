@@ -6,11 +6,14 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceRoot}/src/Vsts.Vault/bin/Debug/netcoreapp2.0/vsts.vault.dll",
+            "program": "${workspaceRoot}/Vsts.Vault/bin/Debug/netcoreapp2.0/vsts.vault.dll",
             "args": [],
             "cwd": "${workspaceRoot}",
             "stopAtEntry": false,
-            "console": "internalConsole"
+            "console": "internalConsole",
+            "env": {
+                "VaultConfiguration.Username": "Carlos Mendible"
+            }
         },
         {
             "name": ".NET Core Attach",
