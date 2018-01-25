@@ -12,7 +12,7 @@
             "stopAtEntry": false,
             "console": "internalConsole",
             "env": {
-                "VaultConfiguration.Username": "Carlos Mendible"
+                "VaultConfiguration:Username": "Carlos Mendible"
             }
         },
         {
