@@ -4,7 +4,14 @@
 
 Backup your Team Services Git Repositories with VSTS Vault: A simple console application designed to keep a local copy of all your code.
 
-To use VSTS Vault you’ll need to follow these steps:
+You can run VSTS Vault with a docker container:
+
+```
+docker pull cmendibl3/vstsvault
+docker run -it --env "VaultConfiguration:Account=[your VSTS account name]" --env "VaultConfiguration:Password=[Your VSTS account access token]" -v c:/temp:/app/backup cmendibl3/vstsvault
+```
+
+Or follow these steps:
 
 ### 1. Create Alternate Credentials for your Visual Studio Team Services Account
 If you haven’t setup alternate credentials for your [Visual Studio Team Services](https://www.visualstudio.com/en-us/products/visual-studio-team-services-vs.aspx) Account follow the instructions of the Alternate Access Credentials section of the following doc:  [Client Authentication Options](https://www.visualstudio.com/docs/report/analytics/client-authentication-options)
